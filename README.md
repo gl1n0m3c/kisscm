@@ -105,8 +105,7 @@ def create_banner(text):
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
-        print("Ошибка: Необходимо указать текст для баннера.")
-        print("Пример использования: python banner.py 'Ваш текст здесь'")
+        print("Usage: python banner.py <your_text>")
     else:
         input_text = sys.argv[1]
         create_banner(input_text)
@@ -193,3 +192,137 @@ sudo cp $1 /usr/local/bin
 ### Вывод
 
 Пустой
+
+
+
+# Задание 6
+### Условие
+
+Написать программу для проверки наличия комментария в первой строке файлов с расширением c, js и py.
+
+### Код
+
+Файл `check_comment.py`
+```python
+#!/usr/bin/env python3
+import os
+import sys
+
+def check_comment(directory):
+    extensions = {
+        '.c': '//',
+        '.js': '//',
+        '.py': '#'
+    }
+
+    for entry in os.scandir(directory):
+        if entry.is_file():
+            ext = os.path.splitext(entry.name)[-1]
+            if ext in extensions:
+                with open(entry.path, 'r') as f:
+                    first_line = f.readline().strip()
+                    if first_line.startswith(extensions[ext]):
+                        print(f"{entry.name}: Комментарий присутствует")
+                    else:
+                        print(f"{entry.name}: Комментарий отсутствует")
+
+if __name__ == "__main__":
+    if len(sys.argv) < 2:
+        print("Usage: ./main.py <path_to_directory>")
+    else:
+        directory = sys.argv[1]
+        check_comment(directory)
+
+
+```
+
+Командная строка:
+```bash
+./check_comment.py "./"
+```
+
+### Вывод
+
+```
+check_comment.py: Комментарий присутствует
+example.c: Комментарий присутствует
+example.py: Комментарий присутствует
+example.js: Комментарий отсутствует
+```
+
+
+
+# Задание 7
+### Условие
+
+Написать программу для нахождения файлов-дубликатов (имеющих 1 или более копий содержимого) по заданному пути (и подкаталогам).
+
+### Код
+
+Файл `duplicates.py`
+```python
+#!/usr/bin/env python3
+import os
+import hashlib
+
+def hash_file(filepath):
+    hasher = hashlib.sha256()
+    with open(filepath, 'rb') as f:
+        buf = f.read(65536)  # Читаем файл блоками по 65536 байт, так как файлы могут быть больших рамеров
+        while len(buf) > 0:
+            hasher.update(buf)
+            buf = f.read(65536)
+    return hasher.hexdigest()
+
+def find_duplicates(start_dir):
+    hashes = {}
+    duplicates = []
+
+    # Итерируемся по всем вложеным директориям от переданной
+    for dirpath, dirnames, filenames in os.walk(start_dir):
+        for filename in filenames:
+            filepath = os.path.join(dirpath, filename)
+            file_hash = hash_file(filepath)
+            if file_hash in hashes:
+                hashes[file_hash].append(filepath)
+            else:
+                hashes[file_hash] = [filepath]
+
+    # Ищем группы дубликатов
+    for paths in hashes.values():
+        if len(paths) > 1:
+            duplicates.append(paths)
+
+    return duplicates
+
+if __name__ == "__main__":
+    import sys
+    if len(sys.argv) > 1:
+        directory = sys.argv[1]
+        found_duplicates = find_duplicates(directory)
+        if found_duplicates:
+            print("Найдены дубликаты:")
+            for duplicate_group in found_duplicates:
+                print("\nГруппа дубликатов:")
+                for filepath in duplicate_group:
+                    print(filepath)
+        else:
+            print("Дубликаты не найдены.")
+    else:
+        print("Usage: python find_duplicates.py <directory>")
+```
+
+Командная строка:
+```bash
+./duplicates.py "./"
+```
+
+### Вывод
+
+```
+Найдены дубликаты:
+
+Группа дубликатов:
+./dupl1.c
+./dupl/dupl2.c
+```
