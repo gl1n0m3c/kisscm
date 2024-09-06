@@ -309,7 +309,7 @@ if __name__ == "__main__":
         else:
             print("Дубликаты не найдены.")
     else:
-        print("Usage: python find_duplicates.py <directory>")
+        print("Usage: ./ find_duplicates.py <directory>")
 ```
 
 Командная строка:
@@ -325,4 +325,161 @@ if __name__ == "__main__":
 Группа дубликатов:
 ./dupl1.c
 ./dupl/dupl2.c
+```
+
+
+
+# Задание 8
+### Условие
+
+Написать программу, которая находит все файлы в данном каталоге с расширением, указанным в качестве аргумента и архивирует все эти файлы в архив tar.
+
+### Код
+
+Файл `archive.py`
+```python
+#!/usr/bin/env python3
+import os
+import tarfile
+import sys
+
+
+def archive(directory, extension):
+    tar_filename = f"archive_{extension.replace('.', '')}.tar"
+
+    with tarfile.open(tar_filename, "w") as tar:
+        for file in os.listdir(directory):
+            if file.endswith(extension):
+                tar.add(os.path.join(directory, file))
+    print(f"Архив {tar_filename} создан.")
+
+
+if __name__ == "__main__":
+    if len(sys.argv) < 3 or sys.argv[2][0] != ".":
+        print("Usage: ./archive.py <directory> <extension> (with .)")
+    else:
+        directory, extension = sys.argv[1], sys.argv[2]
+        archive(directory, extension)
+```
+
+Командная строка:
+```bash
+./archive.py "./" ".py"
+```
+```bash
+ls
+```
+
+### Вывод
+
+```
+Архив archive_py.tar создан.
+```
+```
+archive.py  archive_py.tar  example.c  example.js  example.py
+```
+
+
+
+# Задание 9
+### Условие
+
+Написать программу, которая заменяет в файле последовательности из 4 пробелов на символ табуляции. Входной и выходной файлы задаются аргументами.
+
+### Код
+
+Файл `spaces_to_tabs.py`
+```python
+#!/usr/bin/env python3
+import sys
+
+
+def spaces_to_tabs(input, output):
+    try:
+        with open(input) as file:
+            content = file.read()
+
+        content_tabs = content.replace("    ", "\t")
+
+        with open(output, "w") as file:
+            file.write(content_tabs)
+
+        print(f"Файл '{input}' был обработан, результат сохранён в '{output}'.")
+    except Exception as e:
+        print(f"Error: {e}")
+
+if __name__ == "__main__":
+    if len(sys.argv) < 3:
+        print("Usage: spaces_to_tabs.py <input_file> <output_file>")
+    else:
+        input, output = sys.argv[1], sys.argv[2]
+        spaces_to_tabs(input, output)
+```
+
+Командная строка:
+```bash
+./spaces_to_tabs.py "spaces_to_tabs.py" "new_spaces_to_tabs.py"
+```
+
+### Вывод
+
+```
+Файл 'spaces_to_tabs.py' был обработан, результат сохранён в 'new_spaces_to_tabs.py'.
+```
+
+
+
+# Задание 10
+### Условие
+
+Написать программу, которая выводит названия всех пустых текстовых файлов в указанной директории. Директория передается в программу параметром.
+
+### Код
+
+Файл `empty.py`
+```python
+#!/usr/bin/env python3
+import os
+import sys
+
+
+def empty(directory):
+    try:
+        files = os.listdir(directory)
+        empty_files = []
+
+        for file in files:
+            file_path = os.path.join(directory, file)
+            if os.path.isfile(file_path) and os.path.getsize(file_path) == 0:
+                empty_files.append(file)
+
+        if empty_files:
+            print("Пустые текстовые файлы в директории:")
+            for file in empty_files:
+                print(file)
+        else:
+            print("Пустые текстовые файлы не найдены.")
+    except Exception as e:
+        print(f"Произошла ошибка: {e}")
+
+if __name__ == "__main__":
+    if len(sys.argv) < 2:
+        print("Использование: ./empty.py <directory>")
+    else:
+        directory = sys.argv[1]
+        empty(directory)
+```
+
+Командная строка:
+```bash
+./empty.py "./"
+```
+
+### Вывод
+
+```
+Пустые текстовые файлы в директории:
+example.с
+example.py
+example.js
 ```
