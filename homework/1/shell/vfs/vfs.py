@@ -1,5 +1,7 @@
 import os
 import zipfile
+import re
+import xml.etree.ElementTree as ET
 
 
 class VirtualFileSystem:
@@ -9,6 +11,57 @@ class VirtualFileSystem:
 
         self.zip_file = zipfile.ZipFile(zip_path, 'a')
         self.current_dir = "~"
+        self.permissions_file = "permissions.txt"
+        self.permissions = self.load_permissions()
+        self.log_root = ET.Element("session")
+
+    def load_permissions(self):
+        permissions = {}
+        if os.path.exists(self.permissions_file):
+            with open(self.permissions_file, 'r') as f:
+                for line in f:
+                    file, perm = line.strip().split()
+                    permissions[file] = perm
+        return permissions
+
+    def save_permissions(self):
+        with open(self.permissions_file, 'w') as f:
+            for file, perm in self.permissions.items():
+                f.write(f"{file} {perm}\n")
+
+    def log_action(self, command, result):
+        action = ET.SubElement(self.log_root, "action")
+        ET.SubElement(action, "command").text = command
+        ET.SubElement(action, "result").text = result
+
+    def save_log(self):
+        tree = ET.ElementTree(self.log_root)
+        tree.write(self.log_path)
+
+    def chmod(self, filename, permissions):
+        if not re.match(r'^[rwx-]{9}$', permissions):
+            result = "Invalid permissions format. Use rwxr-xr-x format."
+            self.log_action(f"chmod {filename} {permissions}", result)
+            return result
+
+        # Determine the full path for the file
+        if self.current_dir == "~":
+            full_path = filename
+        else:
+            full_path = os.path.join(self.current_dir[2:], filename)
+
+        # Check if the file exists in the current directory
+        if full_path not in self.zip_file.namelist():
+            result = f"File {filename} not found in the current directory."
+            self.log_action(f"chmod {filename} {permissions}", result)
+            return result
+
+        # Update permissions
+        self.permissions[full_path] = permissions
+        self.save_permissions()
+        result = f"Permissions for {filename} set to {permissions}"
+        self.log_action(f"chmod {filename} {permissions}", result)
+        return result
 
     def ls(self, path=None):
         content = set()
@@ -36,6 +89,8 @@ class VirtualFileSystem:
                 if item_parts[0]:
                     content.add(item_parts[0])
 
+        result = " ".join(content)
+        self.log_action(f"ls {path if path else ''}", result)
         return content
 
     def cd(self, path):
@@ -46,6 +101,7 @@ class VirtualFileSystem:
                     self.current_dir = "~"
                 else:
                     self.current_dir = "~/" + "/".join(parts)
+            self.log_action(f"cd {path}", "Success")
             return True
 
         if self.current_dir == "~":
@@ -55,13 +111,27 @@ class VirtualFileSystem:
 
         if any(item.startswith(start + path + '/') for item in self.zip_file.namelist()):
             self.current_dir += ("/" + path)
+            self.log_action(f"cd {path}", "Success")
             return True
 
+        self.log_action(f"cd {path}", "Directory not found")
         return False
 
     def touch(self, filename):
-        full_path = os.path.join(self.current_dir, filename)
+        if self.current_dir == "~":
+            full_path = filename
+        else:
+            full_path = os.path.join(self.current_dir[2:], filename)
+
+        if full_path in self.zip_file.namelist():
+            self.log_action(f"touch {filename}", "File already exists")
+            return
+
         self.zip_file.writestr(full_path, '')
+        self.permissions[full_path] = "rw-r--r--"
+        self.save_permissions()
+        self.log_action(f"touch {filename}", f"File {filename} created.")
 
     def close(self):
         self.zip_file.close()
+        self.save_log()

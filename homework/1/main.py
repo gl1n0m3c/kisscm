@@ -1,7 +1,5 @@
 import argparse
-
-from shell.emulator import ShellEmulator
-
+from shell.emulator import ShellGUI
 
 def parse_arguments():
     parser = argparse.ArgumentParser(description="Shell Emulator with Virtual File System")
@@ -11,7 +9,7 @@ def parse_arguments():
 
 def main():
     args = parse_arguments()
-    app = ShellEmulator(args.zip_path, args.log_path)
+    app = ShellGUI(args.zip_path, args.log_path)
     app.start()
 
 if __name__ == "__main__":
