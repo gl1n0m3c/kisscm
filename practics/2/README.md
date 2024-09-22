@@ -363,3 +363,150 @@ _objective = 8;
 ==========
 Finished in 525msec.
 ```
+
+
+
+# Задание 5
+### Условие
+
+Решить на MiniZinc задачу о зависимостях пакетов для рисунка, приведенного ниже.
+![img](img/5_task.png)
+
+### Код
+
+```
+int: mCount = 6;
+int: dCount = 5;
+int: iCount = 2;
+var 1..mCount: m;
+var 1..dCount: d;
+var 1..iCount: i;
+
+array[1..mCount] of tuple(int, int, int): mVersions = 
+  [(1,0,0), (1,1,0), (1,2,0), (1,3,0), (1,4,0), (1,5,0)];
+array[1..dCount] of tuple(int, int, int): dVersions = 
+  [(1,8,0), (2,0,0), (2,1,0), (2,2,0), (2,3,0)];
+array[1..iCount] of tuple(int, int, int): iVersions = 
+  [(1,0,0), (2,0,0)];
+
+constraint (mVersions[m] == (1,0,0) \/ mVersions[m] == (1, 5, 0) /\ iVersions[i] == (1, 0, 0));
+constraint (mVersions[m].2 >= 1 /\ mVersions[m].2 <= 5) -> (dVersions[d] == (2, 3, 0) \/ dVersions[d] == (2, 0, 0));
+constraint mVersions[m] == (1, 0, 0) -> dVersions[d] == (1, 8, 0);
+constraint (dVersions[d].2 >= 0 /\ dVersions[d].2 <= 3) -> iVersions[i] == (2, 0, 0);
+
+solve satisfy;
+
+output [
+  "Menu version: ", show(mVersions[m]), "\n",
+  "Dropdown version: ", show(dVersions[d]), "\n",
+  "Icon version: ", show(iVersions[i]), "\n"
+];
+```
+
+### Вывод
+
+```
+Menu version: (1, 0, 0)
+Dropdown version: (1, 8, 0)
+Icon version: (1, 0, 0)
+```
+
+
+
+# Задание 6
+### Условие
+
+Решить на MiniZinc задачу о зависимостях пакетов для следующих данных:
+```
+root 1.0.0 зависит от foo ^1.0.0 и target ^2.0.0.
+foo 1.1.0 зависит от left ^1.0.0 и right ^1.0.0.
+foo 1.0.0 не имеет зависимостей.
+left 1.0.0 зависит от shared >=1.0.0.
+right 1.0.0 зависит от shared <2.0.0.
+shared 2.0.0 не имеет зависимостей.
+shared 1.0.0 зависит от target ^1.0.0.
+target 2.0.0 и 1.0.0 не имеют зависимостей.
+```
+
+### Код
+
+```
+int: fCount = 2;
+int: lCount = 1;
+int: rCount = 1;
+int: shCount = 2;
+int: tCount = 2;
+
+var 1..fCount: foo;
+var 1..lCount: left;
+var 1..rCount: right;
+var 1..shCount: shared;
+var 1..tCount: target;
+
+array[1..fCount] of tuple(int, int, int): fVersions = 
+[(1,0,0), (1,1,0)];
+array[1..lCount] of tuple(int, int, int): lVersions = 
+[(1,0,0)];
+array[1..rCount] of tuple(int, int, int): rVersions = 
+[(1,0,0)];
+array[1..shCount] of tuple(int, int, int): shVersions = 
+[(1,0,0), (2,0,0)];
+array[1..tCount] of tuple(int, int, int): tVersions = 
+[(1,0,0), (2,0,0)];
+
+
+constraint (fVersions[foo].1 == 1 /\ fVersions[foo].2 >= 0) 
+/\ (tVersions[target].1 == 2 /\ tVersions[target].2 >= 0); 
+constraint fVersions[foo] == (1, 1, 0) -> 
+(lVersions[left].1 == 1 /\ lVersions[left].2 >= 0) 
+/\ (rVersions[right].1 == 1 /\ rVersions[right].2 >= 0); 
+constraint lVersions[left] == (1, 0, 0) ->
+(shVersions[shared].1 >= 1);
+constraint rVersions[right] == (1, 0, 0) ->
+(shVersions[shared].1 < 2);
+constraint shVersions[shared] == (1, 0, 0) ->
+(tVersions[target].1 == 1 /\ tVersions[target].2 >= 0);
+
+tuple(int, int, int): rootVersion = (1,0,0);
+
+solve satisfy;
+
+output [
+"Root version: ", show(rootVersion), "\n",
+"Foo version: ", show(fVersions[foo]), "\n",
+"Left version: ", show(lVersions[left]), "\n",
+"Right version: ", show(rVersions[right]), "\n",
+"Shared version: ", show(shVersions[shared]), "\n",
+"Target version: ", show(tVersions[target]), "\n"
+];
+```
+
+### Вывод
+
+```
+Root version: (1, 0, 0)
+Foo version: (1, 0, 0)
+Left version: (1, 0, 0)
+Right version: (1, 0, 0)
+Shared version: (1, 0, 0)
+Target version: (2, 0, 0)
+```
+
+
+
+# Задание 7
+### Условие
+
+Представить задачу о зависимостях пакетов в общей форме. Здесь необходимо действовать аналогично реальному менеджеру пакетов. То есть получить описание пакета, а также его зависимости в виде структуры данных. Например, в виде словаря. В предыдущих задачах зависимости были явно заданы в системе ограничений. Теперь же систему ограничений надо построить автоматически, по метаданным.
+
+### Код
+
+```
+
+```
+
+### Вывод
+
+```
+
+```
