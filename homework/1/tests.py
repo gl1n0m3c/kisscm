@@ -1,34 +1,48 @@
 import unittest
 import os
+import shutil
 import zipfile
 from shell.vfs.vfs import VirtualFileSystem
 
 class TestVirtualFileSystem(unittest.TestCase):
     def setUp(self):
-        self.zip_path = "test.zip"
-        self.log_path = "test_log.xml"
+        self.test_dir = "test"
+        os.makedirs(self.test_dir, exist_ok=True)
+
+        self.zip_path = os.path.join(self.test_dir, "test.zip")
+        self.log_path = os.path.join(self.test_dir, "test_log.xml")
+
         with zipfile.ZipFile(self.zip_path, 'w') as zf:
             zf.writestr("test.txt", "content")
+
         self.vfs = VirtualFileSystem(self.zip_path, self.log_path)
 
     def tearDown(self):
         self.vfs.close()
-        os.remove(self.zip_path)
-        if os.path.exists(self.log_path):
-            os.remove(self.log_path)
         if os.path.exists(self.vfs.permissions_file):
             os.remove(self.vfs.permissions_file)
+        if os.path.exists(self.test_dir):
+            shutil.rmtree(self.test_dir)
 
-    def test_ls(self):
+    def test_ls_touch(self):
         self.assertIn("test.txt", self.vfs.ls())
+
+        self.vfs.touch("test1.txt")
+        self.vfs.touch("test2.txt")
+        self.assertIn("test1.txt", self.vfs.ls())
+        self.assertIn("test2.txt", self.vfs.ls())
+
+        self.vfs.touch("subdir/")
+        self.vfs.cd("subdir")
+        self.vfs.touch("subfile.txt")
+        self.assertIn("subfile.txt", self.vfs.ls())
+
+        self.vfs.cd("..")
+        self.assertIn("subdir", self.vfs.ls())
 
     def test_cd(self):
         self.assertTrue(self.vfs.cd(".."))
         self.assertFalse(self.vfs.cd("nonexistent"))
-
-    def test_touch(self):
-        self.vfs.touch("newfile.txt")
-        self.assertIn("newfile.txt", self.vfs.ls())
 
     def test_chmod(self):
         self.vfs.touch("chmodfile.txt")
