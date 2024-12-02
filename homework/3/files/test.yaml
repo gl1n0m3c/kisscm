@@ -1,0 +1,9 @@
+comment: "abobis"
+variables:
+  - name: MY_CONSTANT
+    value: 42
+  - name: ANOTHER_CONSTANT
+    value: [1, 2, 3]
+expressions:
+  - expression: "@(MY_CONSTANT 1 +)"
+  - expression: "@(ANOTHER_CONSTANT max)"

@@ -1,0 +1,110 @@
+<LOGS>
+<Operation type="LOAD_CONSTANT">
+  <A>98</A>
+  <Constant>4294967284</Constant>
+  <Register>1</Register>
+</Operation>
+<Operation type="LOAD_CONSTANT">
+  <A>98</A>
+  <Constant>12</Constant>
+  <Register>2</Register>
+</Operation>
+<Operation type="LOAD_CONSTANT">
+  <A>98</A>
+  <Constant>4294967244</Constant>
+  <Register>3</Register>
+</Operation>
+<Operation type="LOAD_CONSTANT">
+  <A>98</A>
+  <Constant>52</Constant>
+  <Register>4</Register>
+</Operation>
+<Operation type="MEMORY_WRITE">
+  <A>17</A>
+  <Register>0</Register>
+  <Offset>0</Offset>
+  <Value>1</Value>
+</Operation>
+<Operation type="MEMORY_WRITE">
+  <A>17</A>
+  <Register>0</Register>
+  <Offset>1</Offset>
+  <Value>2</Value>
+</Operation>
+<Operation type="MEMORY_WRITE">
+  <A>17</A>
+  <Register>0</Register>
+  <Offset>2</Offset>
+  <Value>3</Value>
+</Operation>
+<Operation type="MEMORY_WRITE">
+  <A>17</A>
+  <Register>0</Register>
+  <Offset>3</Offset>
+  <Value>4</Value>
+</Operation>
+<Operation type="LOAD_CONSTANT">
+  <A>98</A>
+  <Constant>0</Constant>
+  <Register>1</Register>
+</Operation>
+<Operation type="LOAD_CONSTANT">
+  <A>98</A>
+  <Constant>1</Constant>
+  <Register>2</Register>
+</Operation>
+<Operation type="LOAD_CONSTANT">
+  <A>98</A>
+  <Constant>2</Constant>
+  <Register>3</Register>
+</Operation>
+<Operation type="LOAD_CONSTANT">
+  <A>98</A>
+  <Constant>3</Constant>
+  <Register>4</Register>
+</Operation>
+<Operation type="ABS">
+  <A>57</A>
+  <Address>1</Address>
+  <Register>1</Register>
+</Operation>
+<Operation type="ABS">
+  <A>57</A>
+  <Address>2</Address>
+  <Register>2</Register>
+</Operation>
+<Operation type="ABS">
+  <A>57</A>
+  <Address>3</Address>
+  <Register>3</Register>
+</Operation>
+<Operation type="ABS">
+  <A>57</A>
+  <Address>4</Address>
+  <Register>4</Register>
+</Operation>
+<Operation type="MEMORY_WRITE">
+  <A>17</A>
+  <Register>0</Register>
+  <Offset>0</Offset>
+  <Value>1</Value>
+</Operation>
+<Operation type="MEMORY_WRITE">
+  <A>17</A>
+  <Register>0</Register>
+  <Offset>1</Offset>
+  <Value>2</Value>
+</Operation>
+<Operation type="MEMORY_WRITE">
+  <A>17</A>
+  <Register>0</Register>
+  <Offset>2</Offset>
+  <Value>3</Value>
+</Operation>
+<Operation type="MEMORY_WRITE">
+  <A>17</A>
+  <Register>0</Register>
+  <Offset>3</Offset>
+  <Value>4</Value>
+</Operation>
+</LOGS>

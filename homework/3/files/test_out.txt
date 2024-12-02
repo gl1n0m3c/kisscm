@@ -1,0 +1,5 @@
+' abobis
+set MY_CONSTANT = 42
+set ANOTHER_CONSTANT = { 1, 2, 3 }
+@(MY_CONSTANT 1 +) = 43
+@(ANOTHER_CONSTANT max) = 3

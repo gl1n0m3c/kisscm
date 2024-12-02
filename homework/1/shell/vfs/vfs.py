@@ -17,17 +17,17 @@ class VirtualFileSystem:
 
     def load_permissions(self):
         permissions = {}
-        if os.path.exists(self.permissions_file):
-            with open(self.permissions_file, 'r') as f:
+        if self.permissions_file in self.zip_file.namelist():
+            with self.zip_file.open(self.permissions_file) as f:
                 for line in f:
-                    file, perm = line.strip().split()
+                    file, perm = line.decode().strip().split()
                     permissions[file] = perm
         return permissions
 
     def save_permissions(self):
-        with open(self.permissions_file, 'w') as f:
+        with self.zip_file.open(self.permissions_file, 'w') as f:
             for file, perm in self.permissions.items():
-                f.write(f"{file} {perm}\n")
+                f.write(f"{file} {perm}\n".encode())
 
     def log_action(self, command, result):
         action = ET.SubElement(self.log_root, "action")
@@ -79,14 +79,14 @@ class VirtualFileSystem:
         if parts:
             prefix = '/'.join(parts) + '/'
             for item in all_items:
-                if item.startswith(prefix):
+                if item.startswith(prefix) and item != self.permissions_file:
                     relative_path = item[len(prefix):].split('/')
                     if relative_path[0]:
                         content.add(relative_path[0])
         else:
             for item in all_items:
                 item_parts = item.split('/')
-                if item_parts[0]:
+                if item_parts[0] and item != self.permissions_file:
                     content.add(item_parts[0])
 
         result = " ".join(content)
@@ -131,6 +131,23 @@ class VirtualFileSystem:
         self.permissions[full_path] = "rw-r--r--"
         self.save_permissions()
         self.log_action(f"touch {filename}", f"File {filename} created.")
+
+    def check_file_in_permissions(self, filename):
+        # Determine the full path for the file
+        if self.current_dir == "~":
+            full_path = filename
+        else:
+            full_path = os.path.join(self.current_dir[2:], filename)
+
+        # Check if the file exists in the zip archive
+        if full_path not in self.zip_file.namelist():
+            return "Unknown command"
+
+        # Check if the file is in the permissions list
+        if full_path in self.permissions:
+            return f"File {filename} is in permissions."
+        else:
+            return f"File {filename} is not in permissions."
 
     def close(self):
         self.zip_file.close()

@@ -41,9 +41,11 @@ class ShellEmulator:
             else:
                 return "Usage: chmod <filename> <permissions>"
         else:
-            return "Unknown command"
+            return self.check_file(command)
 
-        return ""
+    def check_file(self, filename):
+        return self.vfs.check_file_in_permissions(filename)
+
 
 class ShellGUI:
     def __init__(self, zip_path, log_path):
